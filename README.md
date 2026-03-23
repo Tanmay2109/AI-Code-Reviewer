@@ -214,7 +214,7 @@ Understand how to avoid common coding mistakes
 
 BugSense AI is not just a tool — it is a practical learning ecosystem for secure coding.
 
-It helps users:
+# It helps users:
 
 Learn secure coding concepts
 Understand real-world vulnerabilities
@@ -229,7 +229,8 @@ Insecure subprocess usage
 Improper input validation
 Risky code execution patterns
 Weak security hygiene in scripts
-🔮 Future Improvements
+
+# 🔮 Future Improvements
 🌐 Support more languages (JS, TS, Go, C#)
 🧩 Monaco Editor integration
 🧠 Better AI reasoning and explanations
@@ -249,9 +250,4 @@ Built-in Learning & Awareness Modules
 
 This makes BugSense AI more impactful than a standard code analyzer, because it not only detects issues — it also teaches and trains users to fix them.
 
-👨‍💻 Author
 
-Sheikh Wasimuddin
-B.Tech (CSE-IoT) – Yeshwantrao Chavan College of Engineering (YCCE), Nagpur
-
-GitHub: @sheikhwasimuddin
