@@ -231,16 +231,16 @@ Risky code execution patterns
 Weak security hygiene in scripts
 
 # 🔮 Future Improvements
-🌐 Support more languages (JS, TS, Go, C#)
-🧩 Monaco Editor integration
-🧠 Better AI reasoning and explanations
-📊 Code quality scoring dashboard
-📁 File upload for source code review
-☁️ Deploy frontend + backend (Vercel + Render)
-🏆 Challenge scoring / progress tracking
-🔐 Difficulty levels for secure coding labs
-📚 Expanded learning modules
-🏆 Hackathon Value Proposition
+- 🌐 Support more languages (JS, TS, Go, C#)
+- 🧩 Monaco Editor integration
+- 🧠 Better AI reasoning and explanations
+- 📊 Code quality scoring dashboard
+- 📁 File upload for source code review
+- ☁️ Deploy frontend + backend (Vercel + Render)
+- 🏆 Challenge scoring / progress tracking
+- 🔐 Difficulty levels for secure coding labs
+- 📚 Expanded learning modules
+- 🏆 Hackathon Value Proposition
 
 This project stands out because it combines three powerful layers in one platform:
 
