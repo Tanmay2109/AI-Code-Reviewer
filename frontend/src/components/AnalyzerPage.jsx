@@ -1,6 +1,6 @@
 import { useMemo, useState } from "react";
 import Editor from "@monaco-editor/react";
-import { Bug, Download, Play, Shield, Trash2, Upload, Zap, ArrowLeft } from "lucide-react";
+import { Bug, Download, Play, Shield, Trash2, Upload, Zap, ArrowLeft, Bot } from "lucide-react";
 import Navbar from "./Navbar";
 import { PolarAngleAxis, PolarGrid, PolarRadiusAxis, Radar, RadarChart, ResponsiveContainer } from "recharts";
 
@@ -531,6 +531,7 @@ export default function AnalyzerPage({ onNavigate, currentPath }) {
                   <div className="flex gap-2 overflow-auto pb-3 mb-3 border-b border-white/5">
                     {[
                       ["Overview", Zap],
+                      ["AI Diagnostics", Bot],
                       ["Pylint", Bug],
                       ["Bandit", Shield],
                     ].map(([name, Icon]) => (
@@ -568,6 +569,47 @@ export default function AnalyzerPage({ onNavigate, currentPath }) {
                             <span className="text-sm font-bold text-emerald-400">Low: {quickStats.securityLow}</span>
                           </div>
                         </div>
+                      </div>
+                    )}
+
+                    {activeTab === "AI Diagnostics" && (
+                      <div className="space-y-6">
+                        <div className="bg-black/20 p-4 rounded-xl border border-white/5">
+                          <h4 className="text-xs uppercase tracking-widest font-bold text-primary-400 mb-3 flex items-center gap-2">
+                             <Bot className="h-4 w-4" /> Recommended Actions
+                          </h4>
+                          <ul className="space-y-2">
+                            {suggestionList.map((suggestion, idx) => (
+                              <li key={idx} className="flex gap-3 text-sm text-slate-300 items-start">
+                                <span className="text-primary-500 font-bold mt-0.5">•</span>
+                                <span className="leading-relaxed whitespace-pre-line">{suggestion}</span>
+                              </li>
+                            ))}
+                          </ul>
+                        </div>
+                        
+                        {result?.ai_review?.optimized_code && result.ai_review.optimized_code !== code && (
+                          <div className="bg-black/20 p-4 rounded-xl border border-white/5 relative overflow-hidden">
+                             <div className="absolute top-0 right-0 w-32 h-32 bg-emerald-500/10 rounded-full blur-[40px] pointer-events-none"></div>
+                             <h4 className="text-xs uppercase tracking-widest font-bold text-emerald-400 mb-3 relative z-10">
+                               Optimized Payload Array
+                             </h4>
+                             <div className="bg-[#0a0f18] p-4 rounded-lg border border-white/5 overflow-x-auto relative z-10 shadow-inner">
+                               <pre className="text-xs text-slate-300 font-mono whitespace-pre">{result.ai_review.optimized_code}</pre>
+                             </div>
+                             <div className="mt-4 flex justify-end relative z-10">
+                               <button 
+                                 onClick={() => {
+                                   setCode(result.ai_review.optimized_code);
+                                   setActiveTab("Overview");
+                                 }}
+                                 className="px-5 py-2.5 bg-emerald-500/10 text-emerald-400 text-xs font-bold border border-emerald-500/20 rounded shadow-glass-sm hover:bg-emerald-500/20 hover:shadow-glow transition-all"
+                               >
+                                  Apply Patch Directly
+                               </button>
+                             </div>
+                          </div>
+                        )}
                       </div>
                     )}
 
