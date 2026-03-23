@@ -5,7 +5,7 @@
 ![GitHub Repo](https://img.shields.io/badge/Project-BugSense%20AI-blueviolet?style=for-the-badge)
 ![Python](https://img.shields.io/badge/Backend-Python%20Flask-yellow?style=for-the-badge)
 ![React](https://img.shields.io/badge/Frontend-React%20%2B%20Vite-61DAFB?style=for-the-badge)
-![Hackathon](https://img.shields.io/badge/Built%20For-RSOC%20Hackathon-success?style=for-the-badge)
+
 
 ---
 
