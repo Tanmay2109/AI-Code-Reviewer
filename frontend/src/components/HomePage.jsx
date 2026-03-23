@@ -1,6 +1,7 @@
 import { ArrowRight, Bug, CheckCircle, Search, Shield, Terminal, Zap, Code } from "lucide-react";
+import Navbar from "./Navbar";
 
-export default function HomePage({ onNavigate }) {
+export default function HomePage({ onNavigate, currentPath }) {
   const features = [
     { icon: Search, title: "Deep Logic Scan", desc: "Identify complex logical bugs that traditional linters miss.", color: "text-primary-400" },
     { icon: Shield, title: "Security Audit", desc: "Auto-detect vulnerability patterns and hardcoded secrets.", color: "text-accent-400" },
@@ -17,21 +18,16 @@ export default function HomePage({ onNavigate }) {
       <div className="orb bg-accent-600 w-[600px] h-[600px] bottom-[-200px] right-[-200px] opacity-20" />
       <div className="orb bg-blue-500 w-[400px] h-[400px] top-[40%] left-[50%] -translate-x-1/2 opacity-10" />
 
-      {/* Floating Glass Navbar */}
-      <nav className="fixed top-4 z-50 w-[90%] max-w-6xl rounded-2xl border border-white/10 bg-surface/50 backdrop-blur-xl shadow-glass-sm pl-6 pr-4 py-3 flex items-center justify-between">
-        <div className="flex items-center gap-3">
-          <div className="rounded-xl flex items-center justify-center bg-gradient-to-br from-primary-500 to-accent-600 p-2 shadow-glow">
-            <Bug className="h-6 w-6 text-white" />
-          </div>
-          <span className="text-2xl font-bold tracking-tight text-white drop-shadow-md cursor-pointer" onClick={() => onNavigate("/")}>
-            BugSense AI
-          </span>
-        </div>
-        <button onClick={() => onNavigate("/analyzer")} className="btn-primary py-2 px-6">
-          Launch App
-          <ArrowRight className="h-4 w-4" />
-        </button>
-      </nav>
+      <Navbar 
+        onNavigate={onNavigate} 
+        currentPath={currentPath}
+        rightElement={
+          <button onClick={() => onNavigate("/analyzer")} className="btn-primary py-2 px-6">
+            Launch App
+            <ArrowRight className="h-4 w-4" />
+          </button>
+        }
+      />
 
       {/* Main Content */}
       <main className="w-full max-w-7xl px-6 pt-40 pb-20 flex flex-col items-center flex-1">

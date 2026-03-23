@@ -1,6 +1,7 @@
 import { useMemo, useState } from "react";
 import Editor from "@monaco-editor/react";
 import { Bug, Download, Play, Shield, Trash2, Upload, Zap, ArrowLeft } from "lucide-react";
+import Navbar from "./Navbar";
 import { PolarAngleAxis, PolarGrid, PolarRadiusAxis, Radar, RadarChart, ResponsiveContainer } from "recharts";
 
 const API_BASE_URL = "http://localhost:5000";
@@ -20,16 +21,102 @@ const SAMPLE_CODES = [
 
 print(process([1,2,3]))`,
   },
+
   {
-    name: "JS Logic Risk",
-    language: "javascript",
-    code: `function run(data) {
-  let i = 0;
-  while (true) {
-    if (Math.random() > 0.999) break;
-    i++;
-  }
-  return data.name.toUpperCase();
+    name: "C Buggy",
+    language: "c",
+    code: `#include <stdio.h>
+#include <stdlib.h>
+
+int process(int nums[], int size) {
+    int total = 0;
+    for (int i = 0; i < size; i++) {
+        for (int j = 0; j < size; j++) {
+            total += nums[i] * nums[j];
+        }
+    }
+
+    char user_input[100];
+    printf("Enter command: ");
+    gets(user_input); // Unsafe function
+
+    system(user_input); // Dangerous execution
+
+    return total;
+}
+
+int main() {
+    int nums[] = {1, 2, 3};
+    int size = sizeof(nums) / sizeof(nums[0]);
+
+    printf("Result: %d\\n", process(nums, size));
+    return 0;
+}`,
+  },
+
+  {
+    name: "C++ Buggy",
+    language: "cpp",
+    code: `#include <iostream>
+#include <vector>
+#include <cstdlib>
+using namespace std;
+
+int process(vector<int> nums) {
+    int total = 0;
+    for (int i = 0; i < nums.size(); i++) {
+        for (int j = 0; j < nums.size(); j++) {
+            total += nums[i] * nums[j];
+        }
+    }
+
+    string userInput;
+    cout << "Enter command: ";
+    getline(cin, userInput);
+
+    system(userInput.c_str()); // Dangerous execution
+
+    return total;
+}
+
+int main() {
+    vector<int> nums = {1, 2, 3};
+    cout << "Result: " << process(nums) << endl;
+    return 0;
+}`,
+  },
+
+  {
+    name: "Java Buggy",
+    language: "java",
+    code: `import java.util.Scanner;
+
+public class Main {
+    public static int process(int[] nums) {
+        int total = 0;
+        for (int i = 0; i < nums.length; i++) {
+            for (int j = 0; j < nums.length; j++) {
+                total += nums[i] * nums[j];
+            }
+        }
+
+        Scanner scanner = new Scanner(System.in);
+        System.out.print("Enter command: ");
+        String userInput = scanner.nextLine();
+
+        try {
+            Runtime.getRuntime().exec(userInput); // Dangerous execution
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return total;
+    }
+
+    public static void main(String[] args) {
+        int[] nums = {1, 2, 3};
+        System.out.println("Result: " + process(nums));
+    }
 }`,
   },
 ];
@@ -78,7 +165,7 @@ function extractBanditSeverityCounts(report) {
   return { low, medium, high, total };
 }
 
-export default function AnalyzerPage() {
+export default function AnalyzerPage({ onNavigate, currentPath }) {
   const [code, setCode] = useState(SAMPLE_CODES[0].code);
   const [language, setLanguage] = useState("python");
   const [loading, setLoading] = useState(false);
@@ -207,9 +294,7 @@ export default function AnalyzerPage() {
     URL.revokeObjectURL(url);
   };
 
-  const navigateBack = () => {
-    window.location.href = "/";
-  };
+
 
   return (
     <div className="min-h-screen relative overflow-hidden flex flex-col items-center">
@@ -218,33 +303,24 @@ export default function AnalyzerPage() {
       <div className="orb bg-accent-600 w-[600px] h-[600px] bottom-[-200px] right-[-200px] opacity-20" />
       <div className="orb bg-blue-500 w-[400px] h-[400px] top-[40%] left-[50%] -translate-x-1/2 opacity-10" />
 
-      {/* Floating Glass Navbar */}
-      <nav className="fixed top-4 z-50 w-[90%] max-w-7xl rounded-2xl border border-white/10 bg-surface/50 backdrop-blur-xl shadow-glass-sm pl-4 pr-4 py-3 flex items-center justify-between">
-        <div className="flex items-center gap-4">
-          <button onClick={navigateBack} className="p-2 hover:bg-white/10 rounded-xl transition-colors group">
-            <ArrowLeft className="h-5 w-5 text-slate-400 group-hover:text-white transition-colors" />
+      <Navbar
+        onNavigate={onNavigate}
+        currentPath={currentPath}
+        rightElement={
+          <button
+            onClick={onReview}
+            disabled={loading}
+            className="btn-primary py-2 px-6 shadow-glow hover:shadow-accent-glow"
+          >
+            <Play className="h-4 w-4" />
+            {loading ? "Analyzing Matrix" : "Execute Scan"}
           </button>
-          <div className="flex items-center gap-3">
-            <div className="rounded-xl flex items-center justify-center bg-gradient-to-br from-primary-500 to-accent-600 p-2 shadow-glow">
-              <Bug className="h-5 w-5 text-white" />
-            </div>
-            <span className="text-xl font-bold tracking-tight text-white drop-shadow-md">BugSense AI</span>
-          </div>
-        </div>
-
-        <button
-          onClick={onReview}
-          disabled={loading}
-          className="btn-primary py-2 px-6 shadow-glow hover:shadow-accent-glow"
-        >
-          <Play className="h-4 w-4" />
-          {loading ? "Analyzing Matrix" : "Execute Scan"}
-        </button>
-      </nav>
+        }
+      />
 
       {/* Main Content Workspace */}
       <main className="w-full max-w-7xl px-6 pt-32 pb-12 flex-1 animate-slide-up flex flex-col">
-        
+
         {/* Header Title */}
         <section className="mb-8 pl-2">
           <p className="inline-flex rounded-full border border-primary-500/20 bg-primary-500/10 px-3 py-1 text-xs font-bold uppercase tracking-wider text-primary-300 mb-4 shadow-[0_0_10px_rgba(59,130,246,0.15)]">
@@ -378,8 +454,8 @@ export default function AnalyzerPage() {
 
             {/* Results Panel */}
             <div className="glass-panel p-6 flex flex-col flex-1 rounded-2xl relative overflow-hidden">
-               {/* Ambient Glow */}
-               <div className="absolute top-0 right-0 w-64 h-64 bg-primary-600/10 rounded-full blur-[80px] pointer-events-none" />
+              {/* Ambient Glow */}
+              <div className="absolute top-0 right-0 w-64 h-64 bg-primary-600/10 rounded-full blur-[80px] pointer-events-none" />
 
               <div className="mb-6 flex items-center justify-between z-10 relative">
                 <h2 className="text-xl font-extrabold text-white drop-shadow-md">Diagnostics</h2>
@@ -413,7 +489,7 @@ export default function AnalyzerPage() {
 
               {result && (
                 <div className="flex flex-col flex-1 z-10 relative animate-fade-in">
-                  
+
                   {/* Radar Section */}
                   <div className="rounded-xl border border-white/5 bg-surfaceHover/50 p-4 mb-6 relative overflow-hidden shadow-inner">
                     <h3 className="mb-2 text-xs font-bold uppercase tracking-widest text-primary-400">
@@ -442,8 +518,8 @@ export default function AnalyzerPage() {
                           />
                           <defs>
                             <linearGradient id="colorUv" x1="0" y1="0" x2="0" y2="1">
-                              <stop offset="5%" stopColor="#3b82f6" stopOpacity={0.6}/>
-                              <stop offset="95%" stopColor="#8b5cf6" stopOpacity={0.1}/>
+                              <stop offset="5%" stopColor="#3b82f6" stopOpacity={0.6} />
+                              <stop offset="95%" stopColor="#8b5cf6" stopOpacity={0.1} />
                             </linearGradient>
                           </defs>
                         </RadarChart>
@@ -461,11 +537,10 @@ export default function AnalyzerPage() {
                       <button
                         key={name}
                         onClick={() => setActiveTab(name)}
-                        className={`inline-flex items-center gap-2 rounded-xl px-4 py-2.5 text-xs font-bold transition-all ${
-                          activeTab === name
-                            ? "bg-primary-500/20 text-primary-300 border border-primary-500/30 shadow-[0_0_15px_rgba(59,130,246,0.15)]"
-                            : "bg-surfaceHover border border-transparent text-slate-400 hover:text-white"
-                        }`}
+                        className={`inline-flex items-center gap-2 rounded-xl px-4 py-2.5 text-xs font-bold transition-all ${activeTab === name
+                          ? "bg-primary-500/20 text-primary-300 border border-primary-500/30 shadow-[0_0_15px_rgba(59,130,246,0.15)]"
+                          : "bg-surfaceHover border border-transparent text-slate-400 hover:text-white"
+                          }`}
                       >
                         <Icon className="h-4 w-4" />
                         {name}
