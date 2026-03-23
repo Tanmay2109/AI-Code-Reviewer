@@ -1,0 +1,74 @@
+@import url("https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700;800&family=Manrope:wght@400;500;600;700&display=swap");
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    color-scheme: dark;
+  }
+
+  body {
+    @apply bg-background text-slate-200 antialiased overflow-x-hidden;
+    font-family: "Manrope", "Segoe UI", sans-serif;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4 {
+    font-family: "Space Grotesk", sans-serif;
+  }
+}
+
+@layer components {
+  .glass-card {
+    @apply rounded-2xl border border-white/5 bg-surface/50 backdrop-blur-xl shadow-glass transition-all duration-300;
+  }
+
+  .glass-card:hover {
+    @apply border-white/10 bg-surface/70 shadow-glass-sm;
+  }
+
+  .glass-panel {
+    @apply rounded-xl border border-white/10 bg-background/80 backdrop-blur-lg shadow-2xl;
+  }
+
+  .btn-primary {
+    @apply flex items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-primary-600 to-accent-600 px-5 py-2.5 font-bold text-white transition-all duration-300 shadow-glow;
+  }
+
+  .btn-primary:not(:disabled):hover {
+    @apply shadow-accent-glow scale-[1.02] brightness-110;
+  }
+
+  .btn-primary:disabled {
+    @apply opacity-50 cursor-not-allowed saturate-50 shadow-none hover:scale-100;
+  }
+
+  .gradient-text {
+    @apply bg-gradient-to-r from-primary-400 via-blue-400 to-accent-400 bg-clip-text text-transparent;
+  }
+  
+  .orb {
+    @apply fixed rounded-full blur-[100px] z-[-1] opacity-30 pointer-events-none;
+  }
+}
+
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  @apply bg-background;
+}
+
+::-webkit-scrollbar-thumb {
+  @apply bg-surfaceHover rounded-full border border-white/5;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  @apply bg-slate-600;
+}
