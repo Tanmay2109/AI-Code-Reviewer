@@ -3,6 +3,7 @@ import Navbar from "./Navbar";
 import { Play, CheckCircle2, ChevronRight, TerminalSquare, AlertTriangle, ArrowRight } from "lucide-react";
 import Editor from "@monaco-editor/react";
 import { CHALLENGES } from "../challengesData";
+import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip as RechartsTooltip } from "recharts";
 
 export default function LearnPage({ onNavigate, currentPath, search }) {
   const params = new URLSearchParams(search || "");
@@ -17,11 +18,28 @@ export default function LearnPage({ onNavigate, currentPath, search }) {
   const [output, setOutput] = useState("$ waiting for code execution...");
   const [isRunning, setIsRunning] = useState(false);
   const [showHint, setShowHint] = useState(false);
+  const [testResults, setTestResults] = useState([]);
 
   useEffect(() => {
     setCode(challenge.initialCode);
     setOutput("$ waiting for code execution...");
     setShowHint(false);
+    
+    try {
+      const existingRaw = localStorage.getItem('bugsense-progress');
+      if (existingRaw) {
+        const existing = JSON.parse(existingRaw);
+        if (existing[challenge.id] && existing[challenge.id].details) {
+            setTestResults(existing[challenge.id].details);
+        } else {
+            setTestResults([]);
+        }
+      } else {
+        setTestResults([]);
+      }
+    } catch(e) {
+      setTestResults([]);
+    }
   }, [challenge.id]);
 
   const handleRun = () => {
@@ -33,11 +51,15 @@ export default function LearnPage({ onNavigate, currentPath, search }) {
     setTimeout(() => {
       let passedAll = true;
       let newOutput = "\n\n[TEST SUITE EXECUTION]\n";
+      let passedCount = 0;
       
-      challenge.testCases.forEach((tc, idx) => {
-         const passed = tc.test(code || "");
+      const cleanCode = (code || "").split('\n').map(line => line.split('#')[0]).join('\n');
+      const newTestResults = challenge.testCases.map((tc, idx) => {
+         const passed = tc.test(cleanCode);
          if (!passed) passedAll = false;
+         else passedCount++;
          newOutput += `>> Test ${idx + 1} - ${tc.name}: ${passed ? "[PASS]" : "[FAIL]"}\n`;
+         return { name: tc.name, value: 1, passed };
       });
       
       if (passedAll) {
@@ -46,6 +68,14 @@ export default function LearnPage({ onNavigate, currentPath, search }) {
         newOutput += "\n[ERROR] Vulnerability still present or logic failed to execute.";
       }
       
+      try {
+        const existingRaw = localStorage.getItem('bugsense-progress');
+        const existing = existingRaw ? JSON.parse(existingRaw) : {};
+        existing[challenge.id] = { passed: passedCount, total: challenge.testCases.length, details: newTestResults };
+        localStorage.setItem('bugsense-progress', JSON.stringify(existing));
+      } catch(e) {}
+      
+      setTestResults(newTestResults);
       setOutput(initialTerminal + newOutput);
       setIsRunning(false);
     }, 800);
@@ -130,6 +160,48 @@ export default function LearnPage({ onNavigate, currentPath, search }) {
                   </ul>
                 </div>
               )}
+            </div>
+            
+            {/* Embedded Pie Chart for test progress */}
+            <div className="mt-8 border-t border-white/10 pt-6">
+              <h3 className="text-sm font-bold uppercase tracking-widest text-slate-500 mb-4">Test Case Telemetry</h3>
+              <div className="h-48 w-full bg-black/20 rounded-xl border border-white/5 relative p-4 block">
+                {testResults.length > 0 ? (
+                   <ResponsiveContainer width="100%" height="100%">
+                     <PieChart>
+                       <Pie
+                         data={testResults}
+                         cx="50%"
+                         cy="50%"
+                         innerRadius={40}
+                         outerRadius={65}
+                         paddingAngle={4}
+                         dataKey="value"
+                         stroke="none"
+                       >
+                         {testResults.map((entry, index) => (
+                           <Cell key={`cell-${index}`} fill={entry.passed ? "#10b981" : "#ef4444"} />
+                         ))}
+                       </Pie>
+                       <RechartsTooltip 
+                         content={({ active, payload }) => {
+                           if (active && payload && payload.length) {
+                             const data = payload[0].payload;
+                             return (
+                               <div className="bg-surface border border-white/10 p-2 rounded shadow-glass-sm text-xs font-bold text-slate-200">
+                                 {data.name}: <span className={data.passed ? "text-emerald-400" : "text-rose-400"}>{data.passed ? "PASSED" : "FAILED"}</span>
+                               </div>
+                             );
+                           }
+                           return null;
+                         }}
+                       />
+                     </PieChart>
+                   </ResponsiveContainer>
+                ) : (
+                   <span className="text-xs text-slate-500 font-bold tracking-wider uppercase">Execute code to generate telemetry</span>
+                )}
+              </div>
             </div>
           </div>
           
